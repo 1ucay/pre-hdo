@@ -18,7 +18,7 @@ $user_agents = array(
 );
 
 $url = 'https://www.predistribuce.cz/cs/potrebuji-zaridit/zakaznici/stav-hdo/';
-$file = 'cache_' . md5( $url ) . '.html';
+$file = 'cache_' . md5( $url . $tarif ) . '.html';
 
 if ( file_exists( $file ) && filemtime( $file ) > time() - 600 ) {
 
