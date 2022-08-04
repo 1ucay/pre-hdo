@@ -1,7 +1,7 @@
 <?php
 
 date_default_timezone_set('Europe/Prague');
-
+$json = ( isset( $_GET['json'] ) ) ? 1 : 0;
 $tarif = ( isset( $_GET['tarif'] ) && intval( $_GET['tarif'] ) ) ? $_GET['tarif'] : 490;
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -18,7 +18,7 @@ $user_agents = array(
 );
 
 $url = 'https://www.predistribuce.cz/cs/potrebuji-zaridit/zakaznici/stav-hdo/';
-$file = 'cache_' . md5( $url . $tarif ) . '.html';
+$file = 'cache_' . md5( $url . $tarif . $json ) . '.html';
 
 if ( file_exists( $file ) && filemtime( $file ) > time() - 600 ) {
 
@@ -63,7 +63,11 @@ $dom->preserveWhiteSpace = false;
 $xpath = new DOMXPath( $dom );
 
 $time_current = date('H:i');
-//header('Content-type: application/json');
+
+if ( $json )
+    header('Content-type: application/json');
+
+$data = array();
 
 foreach( $xpath->query( "//div[@id='component-hdo-dnes']//div[@class='hdo-bar']//span" ) as $node ) {
     if ( $node->getAttribute("class") === 'hdont' ) {
@@ -80,16 +84,25 @@ foreach( $xpath->query( "//div[@id='component-hdo-dnes']//div[@class='hdo-bar']/
 
         if ( !empty( $time_range ) && is_array( $time_range ) ) {
 
-            if ( $time_current >= $time_range[0] && $time_current < $time_range[1] ) {
+            $state = ( $time_current >= $time_range[0] && $time_current < $time_range[1] );
+
+            if ( $json ) {
+
+                $data[] = array( 'start' => $time_range[0], 'end' => $time_range[1], 'state' => $state );
+
+            } else if ( $state ) {
                 echo 1;
                 die();
             }
-
         }
     }
 }
 
-echo 0;
+if ( $json )
+    echo json_encode( $data );
+else
+    echo 0;
+
 die();
 
 ?>
