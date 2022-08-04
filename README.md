@@ -1,4 +1,4 @@
-# pre-hdo tarif
+# PRE HDO api tarif
 
 Přes skript v PHP zjistí stav HDO u PRE.
 Do parametru "tarif" lze zadat číslo tarifu.
